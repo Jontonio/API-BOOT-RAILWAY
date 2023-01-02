@@ -1,4 +1,5 @@
-
+import * as dotenv from 'dotenv' // see https://github.com/motdotla/dotenv#how-do-i-use-dotenv-with-import
+dotenv.config()
 import express, { Application } from "express";
 import { Buttons, Client, LocalAuth, Location, MessageMedia, List } from "whatsapp-web.js";
 import socketIO from 'socket.io'
@@ -7,6 +8,7 @@ import cors from "cors";
 import cron from "node-cron";
 import { Response, Request } from "express";
 import moment from "moment";
+
 moment.locale('es');
 
 const corsOptions = {
@@ -19,7 +21,7 @@ const corsOptions = {
 export class Server {
 
     app       : Application;
-    port      : number;
+    port      : number | string;
     httpServer: http.Server;
     io        : socketIO.Server;
     client    : Client;
@@ -27,7 +29,7 @@ export class Server {
     constructor(){
         
         this.app  = express();
-        this.port = 8000;
+        this.port = process.env.PORT || 3977;
 
         /** Socket io */
         this.httpServer = new http.Server(this.app);
