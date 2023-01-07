@@ -81,7 +81,7 @@ export class Server {
     sendAutoMessage(){
         
         //?Need config hour for send
-        cron.schedule('0 7 * * *', () => {
+        cron.schedule('30 7 * * *', () => {
             
             const hoy = moment().format('dddd Do MMMM YYYY');
             const dia = moment().format("D");
