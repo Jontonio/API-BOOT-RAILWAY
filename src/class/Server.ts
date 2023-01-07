@@ -39,7 +39,7 @@ export class Server {
         });
 
         /** Client of whatsapp */
-        this.client = new Client({ puppeteer: { headless: true},
+        this.client = new Client({ puppeteer: { headless: true,args: ['--no-sandbox', '--disable-setuid-sandbox']},
             authStrategy: new LocalAuth({dataPath:'auth-whatsapp'}),
         });
 
