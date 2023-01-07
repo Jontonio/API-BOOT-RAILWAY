@@ -29,7 +29,7 @@ class Server {
             cors: corsOptions
         });
         /** Client of whatsapp */
-        this.client = new whatsapp_web_js_1.Client({ puppeteer: { headless: true },
+        this.client = new whatsapp_web_js_1.Client({ puppeteer: { headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] },
             authStrategy: new whatsapp_web_js_1.LocalAuth({ dataPath: 'auth-whatsapp' }),
         });
         this.middlewars();
@@ -91,7 +91,7 @@ class Server {
         this.app.use((0, cors_1.default)(corsOptions));
     }
     routes() {
-        this.app.get("/", (req, res) => {
+        this.app.get("/boot", (req, res) => {
             res.json({ "msg": "This is web app" });
         });
         // this.app.use('/user', userRoute )
