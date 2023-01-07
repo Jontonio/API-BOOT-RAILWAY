@@ -124,7 +124,7 @@ export class Server {
 
     routes(){
 
-        this.app.get("/", (req:Request, res:Response) => {
+        this.app.get("/boot", (req:Request, res:Response) => {
             res.json({"msg":"This is web app"});
         })
         // this.app.use('/user', userRoute )
