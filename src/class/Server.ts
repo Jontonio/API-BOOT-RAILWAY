@@ -74,6 +74,21 @@ export class Server {
             this.client.initialize();
         })
 
+        this.client.on('message',(message) => {
+
+            if(message.body.toLowerCase()=='dime la fecha'){
+                
+                const hoy = moment().format('dddd Do MMMM YYYY');
+                this.client.sendMessage(message.from,`Hola 🐰 la fecha es: ${hoy}`).then( res => {
+                    console.log("Mensaje de fecha enviada");
+                }).catch( error => {
+                    console.log('Hubo un error al enviar la fecha');
+                    
+                })
+            }
+            
+        })
+
         this.client.initialize();
             
     }
