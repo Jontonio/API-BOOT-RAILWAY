@@ -1,4 +1,13 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -13,6 +22,8 @@ const http_1 = __importDefault(require("http"));
 const cors_1 = __importDefault(require("cors"));
 const node_cron_1 = __importDefault(require("node-cron"));
 const moment_1 = __importDefault(require("moment"));
+const messagePeople_1 = require("../helpers/messagePeople");
+const messageGirlFiend_1 = require("../helpers/messageGirlFiend");
 moment_1.default.locale('es');
 const corsOptions = {
     //? Need change url production */
@@ -56,39 +67,17 @@ class Server {
             this.client.destroy();
             this.client.initialize();
         });
-        this.client.on('message', (message) => {
-            if (message.body.toLowerCase() == 'dime la fecha') {
-                const hoy = (0, moment_1.default)().format('dddd Do MMMM YYYY');
-                this.client.sendMessage(message.from, `Hola 🐰 la fecha es: ${hoy}`).then(res => {
-                    console.log("Mensaje de fecha enviada");
-                }).catch(error => {
-                    console.log('Hubo un error al enviar la fecha');
-                });
+        this.client.on('message', (message) => __awaiter(this, void 0, void 0, function* () {
+            const chat = yield message.getChat();
+            if (!chat.isGroup) {
+                (0, messagePeople_1.onMessagePeople)(this.client, message);
             }
-        });
+        }));
         this.client.initialize();
     }
     sendAutoMessage() {
-        //?Need config hour for send
         node_cron_1.default.schedule('30 7 * * *', () => {
-            const hoy = (0, moment_1.default)().format('dddd Do MMMM YYYY');
-            const dia = (0, moment_1.default)().format("D");
-            //! I need ichat of the group
-            const idChat = '120363026636473509@g.us';
-            if (parseInt(dia) % 2 != 0) {
-                const win = Math.floor(Math.random() * (20 - 5) + 5);
-                const message = `Holaa 👋 buenos días ✨, hoy ${hoy} \n *Daira 🐼* y *José Antonio 🐰* \n tienen que pagar *s/. ${win}* \n`;
-                console.log(message, dia);
-                this.client.sendMessage(idChat, message).then(res => {
-                    console.log(res);
-                });
-            }
-            else {
-                this.client.sendMessage(idChat, `Hoy ${hoy} 😞 no toca pagar para nuestro viaje, pero mañana si 🥺`)
-                    .then(res => {
-                    console.log(res);
-                });
-            }
+            (0, messageGirlFiend_1.sendPaymentGirlFriend)(this.client);
         });
     }
     socket() {

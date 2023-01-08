@@ -2,13 +2,15 @@ import { config } from 'dotenv' // see https://github.com/motdotla/dotenv#how-do
 config()
 
 import express, { Application } from "express";
-import { Buttons, Client, LocalAuth, Location, MessageMedia, List } from "whatsapp-web.js";
+import { Buttons, Client, LocalAuth, Location, MessageMedia, List, Chat } from "whatsapp-web.js";
 import socketIO from 'socket.io'
 import http from 'http'
 import cors from "cors";
 import cron from "node-cron";
 import { Response, Request } from "express";
 import moment from "moment";
+import { onMessagePeople } from '../helpers/messagePeople';
+import { sendPaymentGirlFriend } from '../helpers/messageGirlFiend';
 
 moment.locale('es');
 
@@ -74,51 +76,23 @@ export class Server {
             this.client.initialize();
         })
 
-        this.client.on('message',(message) => {
+        this.client.on('message', async (message) => {
 
-            if(message.body.toLowerCase()=='dime la fecha'){
-                
-                const hoy = moment().format('dddd Do MMMM YYYY');
-                this.client.sendMessage(message.from,`Hola 🐰 la fecha es: ${hoy}`).then( res => {
-                    console.log("Mensaje de fecha enviada");
-                }).catch( error => {
-                    console.log('Hubo un error al enviar la fecha');
-                    
-                })
+            const chat:Chat = await message.getChat()
+
+            if(!chat.isGroup){
+                onMessagePeople(this.client, message);
             }
             
         })
 
         this.client.initialize();
-            
     }
         
     sendAutoMessage(){
         
-        //?Need config hour for send
         cron.schedule('30 7 * * *', () => {
-            
-            const hoy = moment().format('dddd Do MMMM YYYY');
-            const dia = moment().format("D");
-            //! I need ichat of the group
-            const idChat:string = '120363026636473509@g.us'; 
-
-            if( parseInt(dia) % 2 != 0 ){
-
-                const win = Math.floor(Math.random() * (20 - 5) + 5);
-                const message = `Holaa 👋 buenos días ✨, hoy ${hoy} \n *Daira 🐼* y *José Antonio 🐰* \n tienen que pagar *s/. ${win}* \n`;
-                console.log(message, dia);
-                this.client.sendMessage(idChat, message).then( res => {
-                    console.log(res);
-                });
-
-            } else {
-
-                this.client.sendMessage(idChat,`Hoy ${hoy} 😞 no toca pagar para nuestro viaje, pero mañana si 🥺`)
-                    .then( res => {
-                        console.log(res);
-                    })
-            }
+            sendPaymentGirlFriend(this.client);
         });
 
     }
